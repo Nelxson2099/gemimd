@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hola, soy GemiMd | La Carta de Presentación de tu Memoria IA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #070913;
+      --card-bg: rgba(18, 16, 38, 0.7);
+      --card-border: rgba(139, 92, 246, 0.3);
+      --purple-glow: #7C3AED;
+      --violet-neon: #A855F7;
+      --cyan-neon: #38BDF8;
+      --pink-neon: #EC4899;
+      --text-white: #FFFFFF;
+      --text-muted: #94A3B8;
+      --font-main: 'Outfit', sans-serif;
+      --font-code: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(124, 58, 237, 0.25) 0%, transparent 60%),
+        radial-gradient(circle at 90% 90%, rgba(236, 72, 153, 0.15) 0%, transparent 50%);
+      color: var(--text-white);
+      font-family: var(--font-main);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Navbar */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 60px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(16px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 900;
+      font-size: 1.4rem;
+    }
+
+    .nav-logo {
+      width: 40px;
+      height: 40px;
+      filter: drop-shadow(0 0 12px var(--violet-neon));
+      animation: pulseLogo 3s infinite alternate ease-in-out;
+    }
+
+    @keyframes pulseLogo {
+      0% { transform: scale(1); filter: drop-shadow(0 0 8px var(--purple-glow)); }
+      100% { transform: scale(1.08); filter: drop-shadow(0 0 20px var(--violet-neon)); }
+    }
+
+    .btn-nav {
+      background: linear-gradient(135deg, var(--purple-glow) 0%, #4C1D95 100%);
+      color: #FFF;
+      padding: 10px 24px;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.9rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 0 15px rgba(124, 58, 237, 0.4);
+      transition: all 0.3s ease;
+    }
+
+    .btn-nav:hover { transform: translateY(-2px); box-shadow: 0 0 25px rgba(168, 85, 247, 0.7); }
+
+    /* Hero Section */
+    .hero {
+      text-align: center;
+      padding: 100px 20px 60px 20px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .greeting-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(168, 85, 247, 0.12);
+      border: 1px solid var(--card-border);
+      color: var(--violet-neon);
+      padding: 6px 18px;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 24px;
+    }
+
+    .hero-title {
+      font-size: 3.8rem;
+      font-weight: 900;
+      line-height: 1.1;
+      margin-bottom: 24px;
+      letter-spacing: -1px;
+    }
+
+    .hero-title span {
+      background: linear-gradient(135deg, #FFF 20%, var(--violet-neon) 60%, var(--cyan-neon) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      margin-bottom: 40px;
+      font-weight: 400;
+    }
+
+    /* Manifesto Box */
+    .manifesto-box {
+      max-width: 800px;
+      margin: 40px auto;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 40px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      position: relative;
+    }
+
+    .manifesto-quote {
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: #F1F5F9;
+      font-style: italic;
+      line-height: 1.6;
+    }
+
+    .manifesto-author {
+      margin-top: 20px;
+      font-size: 0.95rem;
+      color: var(--cyan-neon);
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    /* Superpowers Grid */
+    .powers-section {
+      max-width: 1100px;
+      margin: 80px auto;
+      padding: 0 20px;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: 2.25rem;
+      font-weight: 800;
+      margin-bottom: 48px;
+    }
+
+    .powers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 28px;
+    }
+
+    .power-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 32px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .power-card:hover {
+      transform: translateY(-8px);
+      border-color: var(--violet-neon);
+      box-shadow: 0 12px 40px rgba(124, 58, 237, 0.3);
+    }
+
+    .power-icon {
+      font-size: 2.5rem;
+      margin-bottom: 16px;
+      display: inline-block;
+    }
+
+    .power-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #FFF;
+    }
+
+    .power-desc {
+      color: var(--text-muted);
+      font-size: 0.98rem;
+    }
+
+    /* Code Preview Box */
+    .interactive-demo {
+      max-width: 900px;
+      margin: 80px auto;
+      padding: 0 20px;
+    }
+
+    .demo-header {
+      background: #0D1117;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px 16px 0 0;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .circle { width: 12px; height: 12px; border-radius: 50%; }
+    .red { background: #FF5F56; }
+    .yellow { background: #FFBD2E; }
+    .green { background: #27C93F; }
+
+    .demo-body {
+      background: #04060E;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-top: none;
+      border-radius: 0 0 16px 16px;
+      padding: 24px;
+      font-family: var(--font-code);
+      font-size: 0.9rem;
+      color: var(--cyan-neon);
+      overflow-x: auto;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 60px 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 768px) {
+      .hero-title { font-size: 2.5rem; }
+      .navbar { padding: 16px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <img src="assets/icon-48.png" alt="GemiMd Logo" class="nav-logo">
+      <span>GemiMd v1.2</span>
+    </div>
+    <a href="manual_usuario.html" class="btn-nav">Ver Manual de Usuario</a>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero">
+    <div class="greeting-pill">
+      <span>✨ Hola, mucho gusto. Me llamo GemiMd.</span>
+    </div>
+    <h1 class="hero-title">Soy el Puente de Memoria entre tus <span>IAs y tu Obsidian</span></h1>
+    <p class="hero-subtitle">
+      No permito que tus conversaciones más valiosas en Gemini, ChatGPT, Claude y DeepSeek se desvanezcan en el olvido del navegador. Las transformo en notas Markdown vivas y las guardo en tu Zettelkasten.
+    </p>
+  </header>
+
+  <!-- Manifesto Box -->
+  <section class="manifesto-box">
+    <p class="manifesto-quote">
+      "Tus chats con las Inteligencias Artificiales no son interacciones efímeras. Son extensiones de tu propio pensamiento, fragmentos de ideas, arquitecturas de software y reflexiones que merecen perdurar."
+    </p>
+    <div class="manifesto-author">— Carta de Presentación de GemiMd</div>
+  </section>
+
+  <!-- Superpowers Grid -->
+  <section class="powers-section">
+    <h2 class="section-title">⚡ Mis 4 Superpoderes Principales</h2>
+
+    <div class="powers-grid">
+      
+      <div class="power-card">
+        <div class="power-icon">⚡</div>
+        <h3 class="power-title">Auto-Sync Vivo & Silencioso</h3>
+        <p class="power-desc">Observo el DOM mientras chateas. Cuando la IA termina su respuesta y transcurren 5 segundos de reposo, envío la nota en segundo plano directamente a tu Obsidian vía REST API.</p>
+      </div>
+
+      <div class="power-card">
+        <div class="power-icon">🧠</div>
+        <h3 class="power-title">ID Único Anti-Duplicados</h3>
+        <p class="power-desc">Asigno a cada chat una clave única basada en su URL. Si entras a una conversación de hace 3 meses y continúas el diálogo, actualizo esa misma nota limpiamente sin crear duplicados.</p>
+      </div>
+
+      <div class="power-card">
+        <div class="power-icon">🖼️</div>
+        <h3 class="power-title">Escáner de Medios Híbrido B+C</h3>
+        <p class="power-desc">Rescato imágenes de Imagen 3 / DALL-E y videos de YouTube. Genero el enlace local de Obsidian <code>![[adjuntos/...]]</code> pero retengo la URL remota en comentario como respaldo indestructible.</p>
+      </div>
+
+      <div class="power-card">
+        <div class="power-icon">🎨</div>
+        <h3 class="power-title">Simetría Tipográfica H4</h3>
+        <p class="power-desc">Convierto los encabezados internos gigantes de la IA en etiquetas H4 discretas. Así, el texto de la IA coincide exactamente en tamaño con la tipografía de tus preguntas.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Interactive Code Demo -->
+  <section class="interactive-demo">
+    <h2 class="section-title" style="margin-bottom: 24px;">📄 Así es como luzco en tu Obsidian</h2>
+    
+    <div class="demo-header">
+      <div class="circle red"></div>
+      <div class="circle yellow"></div>
+      <div class="circle green"></div>
+      <span style="font-family: var(--font-code); font-size: 0.85rem; color: var(--text-muted); margin-left: 10px;">2026-07-28_Gemini_Presion_Estoicismo_y_Autodescubrimiento_e7ea.md</span>
+    </div>
+    
+    <div class="demo-body">
+<pre>---
+title: "Presión, Estoicismo y Autodescubrimiento"
+date: "2026-07-28 15:37:46"
+source: "https://gemini.google.com/app/e7ea43b6732218a8"
+platform: "Gemini"
+chat_id: "e7ea43b6732218a8"
+tags:
+  - zettelkasten
+  - ai-memory
+  - gemimd
+---
+
+# Presión, Estoicismo y Autodescubrimiento
+
+## 👤 Usuario
+a que edad murio camus?
+
+## 🤖 Gemini
+Albert Camus murió a los **46 años**.
+
+Falleció el 4 de enero de 1960 en un trágico accidente automovilístico...
+
+#### 📝 Nota de corrección:
+La palabra "que" en pregunta directa lleva tilde ("Qué")...</pre>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>GemiMd Exporter v1.2 • Creado por Antigravity AI para Nelson Pacheco</p>
+    <p style="margin-top: 8px; font-size: 0.8rem; color: rgba(255, 255, 255, 0.4);">Para Obsidian, Agentes IA y la Comunidad Zettelkasten</p>
+  </footer>
+
+</body>
+</html>

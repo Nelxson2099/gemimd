@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GemiMd Exporter</title>
+  <link rel="stylesheet" href="popup.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="brand">
+        <img src="assets/icon-48.png" alt="GemiMd Logo" class="brand-icon" id="logoImg">
+        <div class="brand-text">
+          <h1>GemiMd <span class="badge-version">v1.2</span></h1>
+          <p>AI Memory & Zettelkasten Exporter</p>
+        </div>
+      </div>
+    </header>
+
+    <!-- Status Card -->
+    <main class="content">
+      <div class="status-card" id="statusCard">
+        <div class="status-header">
+          <span class="status-dot pulsing" id="statusDot"></span>
+          <span class="platform-name" id="platformName">Detectando IA...</span>
+        </div>
+        <div class="metrics-row">
+          <div class="metric">
+            <span class="metric-value" id="turnCount">--</span>
+            <span class="metric-label">Turnos</span>
+          </div>
+          <div class="metric">
+            <span class="metric-value" id="wordCount">--</span>
+            <span class="metric-label">Palabras Est.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Auto-Sync Toggle Card -->
+      <div class="toggle-card">
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <span class="toggle-title">⚡ Auto-Sync Vivo</span>
+            <span class="toggle-subtitle">Sincroniza notas automáticamente</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="chkAutoSync">
+            <span class="slider round"></span>
+          </label>
+        </div>
+        <div class="api-key-group" id="apiKeyGroup" style="display: none; margin-top: 8px;">
+          <input type="text" id="apiKeyInput" class="text-input" placeholder="Pega tu Obsidian REST API Key aquí">
+        </div>
+      </div>
+
+      <!-- Folder Selection -->
+      <div class="settings-group">
+        <label for="vaultFolderInput" class="input-label">Carpeta Destino en Obsidian:</label>
+        <input type="text" id="vaultFolderInput" class="text-input" value="5_Conversaciones" placeholder="ej. 5_Conversaciones, Chats_IA (o vacío)">
+      </div>
+
+      <!-- Settings & Tags -->
+      <div class="settings-group">
+        <label for="customTags" class="input-label">Etiquetas Zettelkasten (separadas por coma):</label>
+        <input type="text" id="customTags" class="text-input" value="zettelkasten, ai-memory, gemimd" placeholder="ej. salud, filosofia, idea">
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="actions">
+        <button id="btnSyncNow" class="btn btn-primary" style="background: linear-gradient(135deg, #7C3AED 0%, #4C1D95 100%);">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+            <polyline points="2 17 12 22 22 17"></polyline>
+            <polyline points="2 12 12 17 22 12"></polyline>
+          </svg>
+          <span id="btnSyncText">⚡ Sincronizar en Obsidian</span>
+        </button>
+
+        <button id="btnDownload" class="btn btn-secondary">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Descargar .md
+        </button>
+
+        <div class="button-row">
+          <button id="btnCopy" class="btn btn-secondary">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            Copiar MD
+          </button>
+
+          <button id="btnObsidian" class="btn btn-secondary btn-obsidian">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+              <polyline points="2 17 12 22 22 17"></polyline>
+              <polyline points="2 12 12 17 22 12"></polyline>
+            </svg>
+            Abrir Obsidian
+          </button>
+        </div>
+      </div>
+
+      <!-- Preview Section -->
+      <div class="preview-box" id="previewBox">
+        <div class="preview-header">
+          <span>Vista previa de nota</span>
+        </div>
+        <pre class="preview-content" id="previewText">Cargando vista previa de la conversación...</pre>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <span>GemiMd Series • Para Obsidian & Agentes IA</span>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

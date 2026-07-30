@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guía de Desarrollo | Cómo Crear Extensiones Chrome Manifest V3 de Cero</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0A0E1A;
+      --card-bg: rgba(15, 23, 42, 0.8);
+      --card-border: rgba(56, 189, 248, 0.25);
+      --accent-purple: #7C3AED;
+      --accent-cyan: #38BDF8;
+      --accent-emerald: #10B981;
+      --accent-rose: #F43F5E;
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --font-heading: 'Outfit', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 80% 20%, rgba(56, 189, 248, 0.12) 0%, transparent 45%),
+        radial-gradient(circle at 20% 80%, rgba(124, 58, 237, 0.15) 0%, transparent 45%);
+      color: var(--text-main);
+      font-family: var(--font-heading);
+      line-height: 1.6;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .badge-label {
+      display: inline-block;
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid var(--card-border);
+      color: var(--accent-cyan);
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    h1 { font-size: 3rem; font-weight: 900; margin-bottom: 16px; background: linear-gradient(135deg, #FFF 0%, var(--accent-cyan) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    p.lead { font-size: 1.2rem; color: var(--text-muted); margin-bottom: 40px; }
+
+    .glass-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 32px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    h2 { font-size: 1.75rem; font-weight: 700; margin-bottom: 20px; color: var(--accent-cyan); display: flex; align-items: center; gap: 12px; }
+    h3 { font-size: 1.2rem; font-weight: 600; margin: 24px 0 12px 0; color: #FFF; }
+
+    /* Code Highlight */
+    pre.code-box {
+      background: #040711;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 20px;
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      color: #38BDF8;
+      overflow-x: auto;
+      margin: 16px 0;
+      line-height: 1.5;
+    }
+
+    .key-highlight { color: #F43F5E; }
+    .string-highlight { color: #10B981; }
+    .comment-highlight { color: #64748B; font-style: italic; }
+
+    /* Architecture Diagram */
+    .arch-diagram {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin: 24px 0;
+    }
+
+    .arch-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 24px;
+      position: relative;
+    }
+
+    .arch-box::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 4px;
+      border-radius: 12px 12px 0 0;
+    }
+
+    .arch-content::before { background: var(--accent-cyan); }
+    .arch-background::before { background: var(--accent-purple); }
+    .arch-popup::before { background: var(--accent-emerald); }
+
+    /* Callout */
+    .alert-warning {
+      background: rgba(244, 63, 94, 0.1);
+      border-left: 4px solid var(--accent-rose);
+      color: #FECDD3;
+      padding: 16px 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <span class="badge-label">Guía de Ingeniería Web Manifest V3</span>
+    <h1>Cómo Crear una Extensión de Chrome desde Cero</h1>
+    <p class="lead">Manual técnico completo inspirado en la arquitectura real de GemiMd v1.2: DOM Parsing, Background Service Workers, Almacenamiento Local y REST API Integration.</p>
+
+    <!-- Step 1: Anatomy -->
+    <div class="glass-card">
+      <h2>🧩 1. La Arquitectura Triangular de Manifest V3</h2>
+      <p>Una extensión moderna de Chrome se compone de tres capas aisladas que se comunican mediante mensajes asíncronos:</p>
+
+      <div class="arch-diagram">
+        <div class="arch-box arch-content">
+          <h3>📄 Content Script</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Se ejecuta directamente sobre las páginas web (Gemini, ChatGPT). Tiene acceso al DOM de la página para scrapear o modificar la interfaz.</p>
+        </div>
+        <div class="arch-box arch-background">
+          <h3>⚙️ Service Worker</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">El cerebro en segundo plano. Escucha eventos, realiza peticiones HTTP/REST API externas y maneja la lógica de descargas.</p>
+        </div>
+        <div class="arch-box arch-popup">
+          <h3>🎨 Popup UI</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">La ventana emergente interactiva que se abre al hacer clic en el icono. Permite al usuario ajustar opciones y disparar acciones.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Manifest JSON -->
+    <div class="glass-card">
+      <h2>📜 2. El Manifiesto (`manifest.json`)</h2>
+      <p>El archivo <code>manifest.json</code> es la carta de identidad de la extensión ante el navegador Chrome:</p>
+
+      <pre class="code-box">
+{
+  <span class="key-highlight">"manifest_version"</span>: 3,
+  <span class="key-highlight">"name"</span>: <span class="string-highlight">"Mi Extension Pro"</span>,
+  <span class="key-highlight">"version"</span>: <span class="string-highlight">"1.0.0"</span>,
+  <span class="key-highlight">"permissions"</span>: [<span class="string-highlight">"storage"</span>, <span class="string-highlight">"activeTab"</span>, <span class="string-highlight">"scripting"</span>],
+  
+  <span class="comment-highlight">// CRÍTICO: Permitir peticiones fetch a IP local y servidores externos</span>
+  <span class="key-highlight">"host_permissions"</span>: [
+    <span class="string-highlight">"http://127.0.0.1/*"</span>,
+    <span class="string-highlight">"https://gemini.google.com/*"</span>
+  ],
+
+  <span class="key-highlight">"background"</span>: {
+    <span class="key-highlight">"service_worker"</span>: <span class="string-highlight">"background.js"</span>
+  },
+
+  <span class="key-highlight">"action"</span>: {
+    <span class="key-highlight">"default_popup"</span>: <span class="string-highlight">"popup.html"</span>,
+    <span class="key-highlight">"default_icon"</span>: {
+      <span class="key-highlight">"16"</span>: <span class="string-highlight">"assets/icon-16.png"</span>,
+      <span class="key-highlight">"48"</span>: <span class="string-highlight">"assets/icon-48.png"</span>
+    }
+  }
+}
+      </pre>
+    </div>
+
+    <!-- Step 3: Content Script & Communication -->
+    <div class="glass-card">
+      <h2>💬 3. Comunicación mediante Mensajes (`chrome.runtime`)</h2>
+      <p>Como las capas están aisladas por seguridad, se comunican usando el protocolo de mensajes de Chrome:</p>
+
+      <h3>1. Enviar desde Popup / Content Script hacia Background:</h3>
+      <pre class="code-box">
+<span class="comment-highlight">// popup.js</span>
+chrome.runtime.sendMessage({
+  action: <span class="string-highlight">'GUARDAR_NOTA'</span>,
+  data: { titulo: <span class="string-highlight">'Mi Nota'</span>, contenido: <span class="string-highlight">'Texto...'</span> }
+}, (response) => {
+  if (response.success) {
+    console.log(<span class="string-highlight">'Guardado con éxito!'</span>);
+  }
+});
+      </pre>
+
+      <h3>2. Recibir en Service Worker (`background.js`):</h3>
+      <pre class="code-box">
+<span class="comment-highlight">// background.js</span>
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === <span class="string-highlight">'GUARDAR_NOTA'</span>) {
+    fetch(<span class="string-highlight">'http://127.0.0.1:27123/vault/Nota.md'</span>, {
+      method: <span class="string-highlight">'PUT'</span>,
+      body: request.data.contenido
+    })
+    .then(() => sendResponse({ success: true }))
+    .catch(err => sendResponse({ success: false, error: err.message }));
+
+    <span class="key-highlight">return true;</span> <span class="comment-highlight">// OBLIGATORIO para respuestas asíncronas</span>
+  }
+});
+      </pre>
+    </div>
+
+    <!-- Step 4: Golden Rules & Troubleshooting -->
+    <div class="glass-card">
+      <h2>⚡ 4. Trampas Frecuentes y Lecciones de Ingeniería</h2>
+
+      <div class="alert-warning">
+        <strong>⚠️ Trampa #1 - Iconos Descalibrados:</strong> Si usas imágenes de 400KB (1024x1024) para <code>icon-16.png</code>, Chrome fallará en silencio y mostrará la pieza azul genérica. Redimensiona siempre los PNGs exactamente a 16x16, 32x32, 48x48 y 128x128 px.
+      </div>
+
+      <div class="alert-warning">
+        <strong>⚠️ Trampa #2 - CORS en Manifest V3:</strong> Si tu Service Worker hace peticiones <code>fetch()</code> a un puerto local (`http://127.0.0.1:27123`), debes agregar explícitamente <code>"http://127.0.0.1/*"</code> dentro de <code>host_permissions</code> en <code>manifest.json</code>.
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>
