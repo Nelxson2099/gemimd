@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const previewTextEl = document.getElementById('previewText');
 
   const chkAutoSync = document.getElementById('chkAutoSync');
+  const chkSaveImages = document.getElementById('chkSaveImages');
   const apiKeyGroup = document.getElementById('apiKeyGroup');
   const apiKeyInput = document.getElementById('apiKeyInput');
 
@@ -21,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentData = null;
 
   // Cargar configuraciones guardadas
-  chrome.storage.local.get(['gemiMdTags', 'gemiMdAutoSync', 'gemiMdRestApiKey', 'gemiMdVaultFolder'], (res) => {
+  chrome.storage.local.get(['gemiMdTags', 'gemiMdAutoSync', 'gemiMdRestApiKey', 'gemiMdVaultFolder', 'gemiMdSaveImages'], (res) => {
     if (res.gemiMdTags) customTagsInput.value = res.gemiMdTags;
     if (res.gemiMdVaultFolder !== undefined) vaultFolderInput.value = res.gemiMdVaultFolder;
     if (res.gemiMdAutoSync) {
@@ -29,15 +30,23 @@ document.addEventListener('DOMContentLoaded', () => {
       apiKeyGroup.style.display = 'block';
     }
     if (res.gemiMdRestApiKey) apiKeyInput.value = res.gemiMdRestApiKey;
+    if (res.gemiMdSaveImages !== undefined) {
+      chkSaveImages.checked = res.gemiMdSaveImages;
+    } else {
+      chkSaveImages.checked = true;
+    }
 
     updateSyncButtonText();
+    requestConversationMD();
   });
 
-  // Actualizar nombre de la carpeta en el botón
+  // Actualizar nombre de la carpeta en el botón y refrescar nota
   vaultFolderInput.addEventListener('input', () => {
     const folder = vaultFolderInput.value.trim();
-    chrome.storage.local.set({ gemiMdVaultFolder: folder });
-    updateSyncButtonText();
+    chrome.storage.local.set({ gemiMdVaultFolder: folder }, () => {
+      updateSyncButtonText();
+      requestConversationMD();
+    });
   });
 
   function updateSyncButtonText() {
@@ -62,30 +71,45 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Manejar cambio en el Switch de Guardar Imágenes
+  chkSaveImages.addEventListener('change', () => {
+    const isChecked = chkSaveImages.checked;
+    chrome.storage.local.set({ gemiMdSaveImages: isChecked }, () => {
+      requestConversationMD();
+    });
+  });
+
   // Guardar la API Key al escribir o cambiar
   apiKeyInput.addEventListener('input', () => {
     chrome.storage.local.set({ gemiMdRestApiKey: apiKeyInput.value.trim() });
   });
 
   // Consultar la pestaña activa
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    if (!tabs[0]) return;
+  function requestConversationMD() {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (!tabs[0]) return;
 
-    const activeTab = tabs[0];
-    
-    chrome.tabs.sendMessage(activeTab.id, { action: 'GET_CONVERSATION_MD' }, (response) => {
-      if (chrome.runtime.lastError || !response || !response.success) {
-        platformNameEl.textContent = 'Abre Gemini, ChatGPT o Claude';
-        previewTextEl.textContent = 'Navega a un chat de IA para extraer y convertir la conversación a Markdown.';
-        turnCountEl.textContent = '0';
-        wordCountEl.textContent = '0';
-        return;
-      }
+      const activeTab = tabs[0];
+      const folder = vaultFolderInput.value.trim();
+      const saveImages = chkSaveImages ? chkSaveImages.checked : true;
+      
+      chrome.tabs.sendMessage(activeTab.id, { 
+        action: 'GET_CONVERSATION_MD',
+        options: { saveImages, vaultFolder: folder }
+      }, (response) => {
+        if (chrome.runtime.lastError || !response || !response.success) {
+          platformNameEl.textContent = 'Abre Gemini, ChatGPT o Claude';
+          previewTextEl.textContent = 'Navega a un chat de IA para extraer y convertir la conversación a Markdown.';
+          turnCountEl.textContent = '0';
+          wordCountEl.textContent = '0';
+          return;
+        }
 
-      currentData = response.data;
-      updateUI(currentData);
+        currentData = response.data;
+        updateUI(currentData);
+      });
     });
-  });
+  }
 
   customTagsInput.addEventListener('input', () => {
     chrome.storage.local.set({ gemiMdTags: customTagsInput.value });

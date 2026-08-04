@@ -4,6 +4,7 @@
 (function () {
   let lastSyncedHash = '';
   let autoSyncTimer = null;
+  let currentOptions = { saveImages: true, vaultFolder: '5_Conversaciones' };
 
   // Listener de mensajes desde el popup
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -34,6 +35,9 @@
 
   // Función principal de extracción
   function extractFullConversation(options) {
+    if (options) {
+      currentOptions = { ...currentOptions, ...options };
+    }
     const hostname = window.location.hostname;
     let platform = 'AI Chat';
     let turns = [];
@@ -136,10 +140,13 @@
   }
 
   function triggerAutoSync() {
-    chrome.storage.local.get(['gemiMdAutoSync', 'gemiMdRestApiKey'], (res) => {
+    chrome.storage.local.get(['gemiMdAutoSync', 'gemiMdRestApiKey', 'gemiMdSaveImages', 'gemiMdVaultFolder'], (res) => {
       if (!res.gemiMdAutoSync) return; // Solo actuar si el usuario activó Auto-Sync
 
-      const convData = extractFullConversation();
+      const saveImages = res.gemiMdSaveImages !== false;
+      const vaultFolder = res.gemiMdVaultFolder || '5_Conversaciones';
+
+      const convData = extractFullConversation({ saveImages, vaultFolder });
       if (!convData || convData.turnCount === 0) return;
 
       const currentHash = simpleHash(convData.markdown);
@@ -151,7 +158,8 @@
       chrome.runtime.sendMessage({
         action: 'AUTO_SYNC_NOTE',
         data: convData,
-        apiKey: res.gemiMdRestApiKey || ''
+        apiKey: res.gemiMdRestApiKey || '',
+        vaultFolder: vaultFolder
       }, (response) => {
         if (response && response.success) {
           console.log('[GemiMd Auto-Sync] Nota actualizada en Obsidian:', convData.filename);
@@ -266,11 +274,21 @@
       const src = img.getAttribute('src') || img.getAttribute('data-src') || '';
       // Ignorar iconos pequeños o avatares de la UI
       if (src && !src.includes('avatar') && !src.includes('favicon') && img.width > 50) {
-        const imgName = `gemimd_img_${Date.now()}_${idx}.png`;
-        // Híbrido B+C: Enlace local de Obsidian + Atributo de fallback web
-        const mdImage = `\n\n![[adjuntos/${imgName}]] <!-- fallback: ${src} -->\n\n`;
-        const placeholder = document.createTextNode(mdImage);
-        img.parentNode ? img.parentNode.replaceChild(placeholder, img) : null;
+        if (currentOptions.saveImages === false) {
+          // Si no se guardan imágenes, usar formato Markdown estándar con URL de internet
+          const mdImage = `\n\n![Imagen](${src})\n\n`;
+          const placeholder = document.createTextNode(mdImage);
+          img.parentNode ? img.parentNode.replaceChild(placeholder, img) : null;
+        } else {
+          const imgName = `gemimd_img_${Date.now()}_${idx}.png`;
+          // Construir ruta relativa al vault
+          const folderPath = (currentOptions.vaultFolder || '5_Conversaciones').trim().replace(/^\/+|\/+$/g, '');
+          const attachmentPath = folderPath ? `${folderPath}/adjuntos/${imgName}` : `adjuntos/${imgName}`;
+          // Híbrido B+C: Enlace local de Obsidian + Atributo de fallback web
+          const mdImage = `\n\n![[${attachmentPath}]] <!-- fallback: ${src} -->\n\n`;
+          const placeholder = document.createTextNode(mdImage);
+          img.parentNode ? img.parentNode.replaceChild(placeholder, img) : null;
+        }
       }
     });
 
